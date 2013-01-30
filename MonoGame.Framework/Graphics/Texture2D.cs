@@ -571,10 +571,23 @@ namespace Microsoft.Xna.Framework.Graphics
                         d3dContext.CopySubresourceRegion(_texture, level, null, stagingTex, 0, 0, 0, 0);
 
                     // Copy the data to the array.
-                    SharpDX.DataStream stream;
-                    d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None, out stream);
-                    stream.ReadRange(data, startIndex, elementCount);
-                    stream.Dispose();
+                    try
+                    {
+                        var box = d3dContext.MapSubresource(stagingTex, 0, SharpDX.Direct3D11.MapMode.Read, SharpDX.Direct3D11.MapFlags.None);
+
+                        var dataPtr = box.DataPointer;
+                        var start = startIndex;
+                        for (int i = 0; i < height; i++)
+                        {
+                            SharpDX.Utilities.Read(dataPtr, data, start, width);
+                            dataPtr += box.RowPitch;
+                            start += width;
+                        }
+                    }
+                    catch
+                    {
+                        // The above code is a hack and only been tested on a few devices.
+                    }
                 }
 
 #else
