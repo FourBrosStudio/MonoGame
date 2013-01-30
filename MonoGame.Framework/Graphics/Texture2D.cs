@@ -583,6 +583,8 @@ namespace Microsoft.Xna.Framework.Graphics
                             dataPtr += box.RowPitch;
                             start += width;
                         }
+
+                        d3dContext.UnmapSubresource(stagingTex, 0);
                     }
                     catch
                     {
