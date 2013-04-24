@@ -1162,12 +1162,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // So overwrite these states with what is needed to perform
             // the clear correctly and restore it afterwards.
             //
-		    var prevScissorRect = ScissorRectangle;
+		   /* var prevScissorRect = ScissorRectangle;
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
             ScissorRectangle = _viewport.Bounds;
             DepthStencilState = DepthStencilState.Default;
-		    BlendState = BlendState.Opaque;
+		    BlendState = BlendState.Opaque;*/
             ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
@@ -1203,9 +1203,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
            		
             // Restore the previous render state.
-		    ScissorRectangle = prevScissorRect;
+		   /* ScissorRectangle = prevScissorRect;
 		    DepthStencilState = prevDepthStencilState;
 		    BlendState = prevBlendState;
+            */
 
 #endif // OPENGL
         }
@@ -1407,6 +1408,8 @@ namespace Microsoft.Xna.Framework.Graphics
                     disposeActions.Clear();
                 }
             }
+            _lastShaderHash = -1;
+            _lastVbHandleAddr = IntPtr.Zero;
 #endif
         }
 
@@ -2339,6 +2342,8 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
+        int _lastShaderHash = -1;
+        IntPtr _lastVbHandleAddr = IntPtr.Zero;
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct
         {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
@@ -2375,9 +2380,16 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexAddr = (IntPtr)(vbHandle.AddrOfPinnedObject().ToInt64() + vertexDeclaration.VertexStride * vertexOffset);
 
-            // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-            vertexDeclaration.Apply(_vertexShader, vertexAddr);
+
+            //int shaderHash = _vertexShader.GetHashCode();
+            //if (shaderHash != _lastShaderHash || _vertexShaderDirty || vertexAddr != _lastVbHandleAddr )
+            {
+                // Setup the vertex declaration to point at the VB data.
+                vertexDeclaration.Apply(_vertexShader, vertexAddr);
+              //  _lastShaderHash = shaderHash;
+              //  _lastVbHandleAddr = vertexAddr;
+            }
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
