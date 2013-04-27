@@ -40,6 +40,28 @@ namespace Microsoft.Xna.Framework.Graphics
             _batcher = new SpriteBatcher(graphicsDevice);
 
             _beginCalled = false;
+
+            for (var i = 0; i < _index.Length / 6; i++)
+            {
+                /*
+                 *  TL    TR
+                 *   0----1 0,1,2,3 = index offsets for vertex indices
+                 *   |   /| TL,TR,BL,BR are vertex references in SpriteBatchItem.
+                 *   |  / |
+                 *   | /  |
+                 *   |/   |
+                 *   2----3
+                 *  BL    BR
+                 */
+                // Triangle 1
+                _index[i * 6 + 0] = (short)(i * 4);
+                _index[i * 6 + 1] = (short)(i * 4 + 1);
+                _index[i * 6 + 2] = (short)(i * 4 + 2);
+                // Triangle 2
+                _index[i * 6 + 3] = (short)(i * 4 + 1);
+                _index[i * 6 + 4] = (short)(i * 4 + 3);
+                _index[i * 6 + 5] = (short)(i * 4 + 2);
+            }
 		}
 
 		public void Begin ()
@@ -95,7 +117,8 @@ namespace Microsoft.Xna.Framework.Graphics
             GraphicsDevice.BlendState = _blendState;
             _blendState.ApplyState(GraphicsDevice);
 #endif
-            
+
+            FlushDeferred();
             _batcher.DrawBatch(_sortMode);
         }
 		
@@ -216,6 +239,36 @@ namespace Microsoft.Xna.Framework.Graphics
             }
         }
 
+        VertexPositionColorTexture[] _deferredVerts = new VertexPositionColorTexture[500 * 4];
+        short[] _index = new short[500 * 6];
+        int _vertIdx;
+
+        private void FlushDeferred()
+        {
+            if (_vertIdx > 0)
+            {
+                if (SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoFlush)
+                {
+                    Setup();
+                    GraphicsDevice.Textures[0] = _lastTexture;
+                    GraphicsDevice.DrawUserIndexedPrimitives(
+                        PrimitiveType.TriangleList,
+                        _deferredVerts,
+                        0,
+                        _vertIdx,
+                        _index,
+                        0,
+                        (_vertIdx / 4) * 2,
+                        VertexPositionColorTexture.VertexDeclaration);
+                }
+
+                _lastTexture = null;
+                _vertIdx = 0;
+            }
+        }
+
+        Texture2D _lastTexture;
+
         internal void DrawInternal(Texture2D texture,
             ref Matrix transform,
             Rectangle? sourceRectangle,
@@ -224,10 +277,12 @@ namespace Microsoft.Xna.Framework.Graphics
             SpriteEffects effect,
             float depth)
         {
-            var item = _batcher.CreateBatchItem();
-
-            item.Depth = depth;
-            item.Texture = texture;
+            if (_lastTexture != null && !ReferenceEquals(_lastTexture, texture))
+            {
+                FlushDeferred();
+            }
+            
+            _lastTexture = texture;
 
             if (sourceRectangle.HasValue)
             {
@@ -259,15 +314,37 @@ namespace Microsoft.Xna.Framework.Graphics
                 _texCoordTL.X = temp;
             }
 
-            item.Set(ref transform,
-                    _tempRect,
-                    origin,
-                    color,
-                    _texCoordTL,
-                    _texCoordBR);
+            var inVec = new Vector3((float)-origin.X, (float)-origin.Y, 0f);
+            Vector3.Transform(ref inVec, ref transform, out _deferredVerts[_vertIdx].Position);
+            _deferredVerts[_vertIdx].Position.Z = depth;
+            _deferredVerts[_vertIdx].Color = color;
+            _deferredVerts[_vertIdx].TextureCoordinate.X = _texCoordTL.X;
+            _deferredVerts[_vertIdx].TextureCoordinate.Y = _texCoordTL.Y;
+            _vertIdx++;
 
-            if (_sortMode == SpriteSortMode.Immediate)
-                _batcher.DrawBatch(_sortMode);
+            inVec = new Vector3((float)_tempRect.Width - origin.X, (float)-origin.Y, 0f);
+            Vector3.Transform(ref inVec, ref transform, out _deferredVerts[_vertIdx].Position);
+            _deferredVerts[_vertIdx].Position.Z = depth;
+            _deferredVerts[_vertIdx].Color = color;
+            _deferredVerts[_vertIdx].TextureCoordinate.X = _texCoordBR.X;
+            _deferredVerts[_vertIdx].TextureCoordinate.Y = _texCoordTL.Y;
+            _vertIdx++;
+            
+            inVec = new Vector3((float)-origin.X, (float)_tempRect.Height - origin.Y, 0f);
+            Vector3.Transform(ref inVec, ref transform, out _deferredVerts[_vertIdx].Position);
+            _deferredVerts[_vertIdx].Position.Z = depth;
+            _deferredVerts[_vertIdx].Color = color;
+            _deferredVerts[_vertIdx].TextureCoordinate.X = _texCoordTL.X;
+            _deferredVerts[_vertIdx].TextureCoordinate.Y = _texCoordBR.Y;
+            _vertIdx++;
+
+            inVec = new Vector3((float)_tempRect.Width - origin.X, (float)_tempRect.Height - origin.Y, 0f);
+            Vector3.Transform(ref inVec, ref transform, out _deferredVerts[_vertIdx].Position);
+            _deferredVerts[_vertIdx].Position.Z = depth;
+            _deferredVerts[_vertIdx].Color = color;
+            _deferredVerts[_vertIdx].TextureCoordinate.X = _texCoordBR.X;
+            _deferredVerts[_vertIdx].TextureCoordinate.Y = _texCoordBR.Y;
+            _vertIdx++;
         }
 
 		public void Draw (Texture2D texture,

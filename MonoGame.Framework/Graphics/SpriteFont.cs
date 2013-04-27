@@ -339,6 +339,10 @@ namespace Microsoft.Xna.Framework.Graphics
                 // This just might be a bug!
                 if (SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoText && SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoSpriteOrText)
                 {
+                    // create matrix
+                    // scale destRect / BoundsInTexture 
+                    // translate to destRect.Center
+                    // rotate by rotation
                     spriteBatch.DrawInternal(
                         _texture, destRect, currentGlyph.BoundsInTexture,
                         color, rotation, Vector2.Zero, effect, depth);
