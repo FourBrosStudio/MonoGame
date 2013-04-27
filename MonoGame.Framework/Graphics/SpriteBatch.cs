@@ -75,6 +75,7 @@ namespace Microsoft.Xna.Framework.Graphics
                 throw new InvalidOperationException("Begin cannot be called again until End has been successfully called.");
 
 			// defaults
+            _needSetup = true;
 			_sortMode = sortMode;
 			_blendState = blendState ?? BlendState.AlphaBlend;
 			_samplerState = samplerState ?? SamplerState.LinearClamp;
@@ -111,7 +112,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		{	
 			_beginCalled = false;
 
-			if (_sortMode != SpriteSortMode.Immediate)
+            if (_sortMode != SpriteSortMode.Immediate && _needSetup)
 				Setup();
 #if PSM   
             GraphicsDevice.BlendState = _blendState;
@@ -124,6 +125,7 @@ namespace Microsoft.Xna.Framework.Graphics
 		
 		void Setup() 
         {
+            _needSetup = false;
             var gd = GraphicsDevice;
 			gd.BlendState = _blendState;
 			gd.DepthStencilState = _depthStencilState;
@@ -242,6 +244,7 @@ namespace Microsoft.Xna.Framework.Graphics
         VertexPositionColorTexture[] _deferredVerts = new VertexPositionColorTexture[500 * 4];
         short[] _index = new short[500 * 6];
         int _vertIdx;
+        bool _needSetup;
 
         private void FlushDeferred()
         {
@@ -249,7 +252,11 @@ namespace Microsoft.Xna.Framework.Graphics
             {
                 if (SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoFlush)
                 {
-                    Setup();
+                    if (_needSetup)
+                    {
+                        Setup();
+                    }
+
                     GraphicsDevice.Textures[0] = _lastTexture;
                     GraphicsDevice.DrawUserIndexedPrimitives(
                         PrimitiveType.TriangleList,
