@@ -202,7 +202,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
         static readonly float[] _posFixup = new float[4];
 
-        internal static readonly List<int> _enabledVertexAttributes = new List<int>();
+        internal static readonly HashSet<int> _enabledVertexAttributes = new HashSet<int>();
 
 #elif PSM
 
