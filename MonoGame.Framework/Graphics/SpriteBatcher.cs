@@ -284,18 +284,15 @@ namespace Microsoft.Xna.Framework.Graphics
 
             var vertexCount = end - start;
 
-            if (SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoFlush)
-            {
-                _device.DrawUserIndexedPrimitives(
-                    PrimitiveType.TriangleList,
-                    _vertexArray,
-                    0,
-                    vertexCount,
-                    _index,
-                    0,
-                    (vertexCount / 4) * 2,
-                    VertexPositionColorTexture.VertexDeclaration);
-            }
+            _device.DrawUserIndexedPrimitives(
+                PrimitiveType.TriangleList,
+                _vertexArray,
+                0,
+                vertexCount,
+                _index,
+                0,
+                (vertexCount / 4) * 2,
+                VertexPositionColorTexture.VertexDeclaration);
 		}
 	}
 }

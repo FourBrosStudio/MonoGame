@@ -337,12 +337,9 @@ namespace Microsoft.Xna.Framework.Graphics
                 // it seems we're applyting the flips ourselves above.
                 //
                 // This just might be a bug!
-                if (SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoText && SpriteBatch.DrawMode != SpriteBatch.DrawModeDebug.NoSpriteOrText)
-                {
-                    spriteBatch.DrawInternal(
-                        _texture, destRect, currentGlyph.BoundsInTexture,
-                        color, rotation, Vector2.Zero, effect, depth);
-                }
+                spriteBatch.DrawInternal(
+                    _texture, destRect, currentGlyph.BoundsInTexture,
+                    color, rotation, Vector2.Zero, effect, depth);
 			}
 		}
 

@@ -177,43 +177,28 @@ namespace Microsoft.Xna.Framework.Graphics
 				w = sourceRectangle.Value.Width*scale.X;
 				h = sourceRectangle.Value.Height*scale.Y;
 			}
-            if (SpriteBatch.DrawMode != DrawModeDebug.NoSprite && SpriteBatch.DrawMode != DrawModeDebug.NoSpriteOrText)
-            {
-                DrawInternal(texture,
-                    new Vector4(position.X, position.Y, w, h),
-                    sourceRectangle,
-                    color,
-                    rotation,
-                    origin * scale,
-                    effect,
-                    depth);
-            }
-		}
 
-        public enum DrawModeDebug
-        {
-            All,
-               NoSprite,
-            NoText,
-            NoSpriteOrText,
-            NoFlush,
-        }
-        public static DrawModeDebug DrawMode = DrawModeDebug.All;
+            DrawInternal(texture,
+                new Vector4(position.X, position.Y, w, h),
+                sourceRectangle,
+                color,
+                rotation,
+                origin * scale,
+                effect,
+                depth);
+		}
 
         public void Draw(Texture2D texture, Rectangle? sourceRectangle, Color color, Vector2 origin, ref Matrix transform, SpriteEffects effect, float depth)
         {
             CheckValid(texture);
 
-            if (SpriteBatch.DrawMode != DrawModeDebug.NoSprite && SpriteBatch.DrawMode != DrawModeDebug.NoSpriteOrText)
-            {
-                DrawInternal(texture,
-                    ref transform,
-                    sourceRectangle,
-                    color,
-                    origin,
-                    effect,
-                    depth);
-            }
+            DrawInternal(texture,
+                ref transform,
+                sourceRectangle,
+                color,
+                origin,
+                effect,
+                depth);
         }
 
         internal void DrawInternal(Texture2D texture,
@@ -289,17 +274,15 @@ namespace Microsoft.Xna.Framework.Graphics
                 w = sourceRectangle.Value.Width * scale;
                 h = sourceRectangle.Value.Height * scale;
             }
-            if (SpriteBatch.DrawMode != DrawModeDebug.NoSprite && SpriteBatch.DrawMode != DrawModeDebug.NoSpriteOrText)
-            {
-                DrawInternal(texture,
-                    new Vector4(position.X, position.Y, w, h),
-                    sourceRectangle,
-                    color,
-                    rotation,
-                    origin * scale,
-                    effect,
-                    depth);
-            }
+
+            DrawInternal(texture,
+                new Vector4(position.X, position.Y, w, h),
+                sourceRectangle,
+                color,
+                rotation,
+                origin * scale,
+                effect,
+                depth);
 		}
 
 		public void Draw (Texture2D texture,
@@ -313,21 +296,18 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
             CheckValid(texture);
 
-            if (SpriteBatch.DrawMode != DrawModeDebug.NoSprite && SpriteBatch.DrawMode != DrawModeDebug.NoSpriteOrText)
-            {
-                DrawInternal(texture,
-                      new Vector4(destinationRectangle.X,
-                                  destinationRectangle.Y,
-                                  destinationRectangle.Width,
-                                  destinationRectangle.Height),
-                      sourceRectangle,
-                      color,
-                      rotation,
-                      new Vector2(origin.X * ((float)destinationRectangle.Width / (float)((sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
-                                        origin.Y * ((float)destinationRectangle.Height) / (float)((sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
-                      effect,
-                      depth);
-            }
+            DrawInternal(texture,
+                    new Vector4(destinationRectangle.X,
+                                destinationRectangle.Y,
+                                destinationRectangle.Width,
+                                destinationRectangle.Height),
+                    sourceRectangle,
+                    color,
+                    rotation,
+                    new Vector2(origin.X * ((float)destinationRectangle.Width / (float)((sourceRectangle.HasValue && sourceRectangle.Value.Width != 0) ? sourceRectangle.Value.Width : texture.Width)),
+                                    origin.Y * ((float)destinationRectangle.Height) / (float)((sourceRectangle.HasValue && sourceRectangle.Value.Height != 0) ? sourceRectangle.Value.Height : texture.Height)),
+                    effect,
+                    depth);
 		}
 
 		internal void DrawInternal (Texture2D texture,
