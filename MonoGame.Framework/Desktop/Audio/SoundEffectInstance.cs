@@ -165,13 +165,11 @@ namespace Microsoft.Xna.Framework.Audio
 			}
 		}
 
-        private float XnaPitchToAlPitch(float xnaPitch)
+        private float XnaPitchToAlPitch(float pitch)
         {
-            if (xnaPitch < -1.0f || xnaPitch > 1.0f)
-            {
-                throw new Exception("XNA PITCH MUST BE WITHIN [-1.0f, 1.0f]!");
-            }
-            return (float)Math.Pow(2, xnaPitch);
+            // pitch is different in XNA and OpenAL. XNA has a pitch between -1 and 1 for one octave down/up.
+            // openAL uses 0.5 to 2 for one octave down/up, while 1 is the default. The default value of 0 would make it completely silent.
+            return (float)Math.Exp(0.69314718 * pitch);
         }
 
 		private void ApplyState ()
