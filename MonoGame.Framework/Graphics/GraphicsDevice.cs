@@ -1132,8 +1132,6 @@ namespace Microsoft.Xna.Framework.Graphics
                     disposeActions.Clear();
                 }
             }
-            _lastShaderHash = -1;
-            _lastVbHandleAddr = IntPtr.Zero;
 #endif
         }
 
@@ -1974,8 +1972,6 @@ namespace Microsoft.Xna.Framework.Graphics
             DrawUserIndexedPrimitives<T>(primitiveType, vertexData, vertexOffset, numVertices, indexData, indexOffset, primitiveCount, VertexDeclarationCache<T>.VertexDeclaration);
         }
 
-        int _lastShaderHash = -1;
-        IntPtr _lastVbHandleAddr = IntPtr.Zero;
         public void DrawUserIndexedPrimitives<T>(PrimitiveType primitiveType, T[] vertexData, int vertexOffset, int numVertices, short[] indexData, int indexOffset, int primitiveCount, VertexDeclaration vertexDeclaration) where T : struct, IVertexType
         {
             Debug.Assert(vertexData != null && vertexData.Length > 0, "The vertexData must not be null or zero length!");
@@ -2012,16 +2008,7 @@ namespace Microsoft.Xna.Framework.Graphics
 
             // Setup the vertex declaration to point at the VB data.
             vertexDeclaration.GraphicsDevice = this;
-
-            var vbHandleAddr = vbHandle.AddrOfPinnedObject();
-
-            int shaderHash = _vertexShader.GetHashCode();
-            if (shaderHash != _lastShaderHash || _vertexShaderDirty || vbHandleAddr != _lastVbHandleAddr )
-            {
-                vertexDeclaration.Apply(_vertexShader, vbHandleAddr);
-                _lastShaderHash = shaderHash;
-                _lastVbHandleAddr = vbHandleAddr;
-            }
+            vertexDeclaration.Apply(_vertexShader, vbHandle.AddrOfPinnedObject());
 
             //Draw
             GL.DrawElements(    PrimitiveTypeGL(primitiveType),
