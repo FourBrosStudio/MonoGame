@@ -57,7 +57,7 @@ namespace Microsoft.Devices.Sensors
 		{
 			if (started == false)
 			{
-				motionManager.StartAccelerometerUpdates(NSOperationQueue.CurrentQueue, AccelerometerHandler);
+				motionManager.StartAccelerometerUpdates();
 				started = true;
 				state = SensorState.Ready;
 			}
@@ -71,6 +71,14 @@ namespace Microsoft.Devices.Sensors
 			started = false;
 			state = SensorState.Disabled;
 		}
+
+        public void Update(float elapsedMs)
+        {
+            if (started && elapsedMs > TimeBetweenUpdates.TotalMilliseconds)
+            {
+                AccelerometerHandler(null, null);
+            }
+        }
 
 		private void AccelerometerHandler(CMAccelerometerData data, NSError error)
 		{
