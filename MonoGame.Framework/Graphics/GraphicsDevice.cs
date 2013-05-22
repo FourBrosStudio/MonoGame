@@ -1162,12 +1162,12 @@ namespace Microsoft.Xna.Framework.Graphics
             // So overwrite these states with what is needed to perform
             // the clear correctly and restore it afterwards.
             //
-		   /* var prevScissorRect = ScissorRectangle;
+		    var prevScissorRect = ScissorRectangle;
 		    var prevDepthStencilState = DepthStencilState;
             var prevBlendState = BlendState;
             ScissorRectangle = _viewport.Bounds;
             DepthStencilState = DepthStencilState.Default;
-		    BlendState = BlendState.Opaque;*/
+		    BlendState = BlendState.Opaque;
             ApplyState(false);
 
             ClearBufferMask bufferMask = 0;
@@ -1203,10 +1203,10 @@ namespace Microsoft.Xna.Framework.Graphics
 #endif
            		
             // Restore the previous render state.
-		   /* ScissorRectangle = prevScissorRect;
+		    ScissorRectangle = prevScissorRect;
 		    DepthStencilState = prevDepthStencilState;
 		    BlendState = prevBlendState;
-            */
+            
 
 #endif // OPENGL
         }
